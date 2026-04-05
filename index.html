@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WP Glass Co. — Wholesale Catalog</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600&family=DM+Sans:wght@400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --teal: #00ffe0;
+    --teal-glow: rgba(0,255,224,0.18);
+    --purple: #b44fff;
+    --purple-glow: rgba(180,79,255,0.18);
+
+    --bg: #050508;
+    --card-bg: #0b0b14;
+    --border: #1a1a2e;
+    --text: #b0b0cc;
+    --white: #ffffff;
+    --muted: #555570;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  .site-header {
+    background: #000;
+    border-bottom: 2px solid transparent;
+    border-image: linear-gradient(90deg, var(--teal), var(--purple)) 1;
+    padding: 18px 24px 14px;
+  }
+
+  .header-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .logo-badge {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    border: 2px solid var(--teal);
+    overflow: hidden;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #000;
+    box-shadow: 0 0 14px rgba(0,255,224,0.2);
+  }
+
+  .logo-badge img {
+    width: 90%;
+    height: 90%;
+    object-fit: contain;
+    display: block;
+  }
+
+  .logo-fallback {
+    font-family: 'Oswald', sans-serif;
+    font-style: italic;
+    font-weight: 800;
+    font-size: 22px;
+    background: linear-gradient(135deg, var(--teal), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+  }
+
+  .header-text { flex: 1; }
+
+  .brand-name {
+    font-family: 'Oswald', sans-serif;
+    font-style: italic;
+    font-weight: 800;
+    font-size: clamp(26px, 5vw, 38px);
+    background: linear-gradient(90deg, var(--teal) 0%, var(--purple) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 0.02em;
+    line-height: 1;
+  }
+
+  .brand-tagline {
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  .header-contact {
+    font-size: 12px;
+    color: var(--muted);
+    text-align: right;
+    line-height: 1.7;
+  }
+
+  .header-contact a { color: var(--teal); text-decoration: none; }
+
+  /* ── CONTROLS ── */
+  .controls {
+    background: #08080f;
+    border-bottom: 1px solid var(--border);
+    padding: 16px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .controls-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .search-wrap {
+    position: relative;
+  }
+
+  .search-wrap svg {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.4;
+  }
+
+  #search {
+    width: 100%;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px 10px 38px;
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  #search::placeholder { color: var(--muted); }
+  #search:focus { border-color: var(--teal); }
+
+  .filter-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .filter-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-right: 4px;
+    flex-shrink: 0;
+  }
+
+  .cat-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 5px 12px;
+    color: var(--text);
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .cat-btn:hover { border-color: var(--teal); color: var(--teal); }
+
+  .cat-btn.active {
+    background: var(--teal-glow);
+    border-color: var(--teal);
+    color: var(--teal);
+  }
+
+  .cat-btn[data-cat="all"].active {
+    background: linear-gradient(135deg, var(--teal-glow), var(--purple-glow));
+    border-color: var(--purple);
+    color: var(--white);
+  }
+
+  .results-count {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+
+  /* ── GRID ── */
+  .catalog-wrap {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+  }
+
+  .product-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.15s;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .product-card:hover {
+    border-color: var(--teal);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0,255,224,0.08);
+  }
+
+  .card-img-wrap {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background: #0f0f1a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .card-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .img-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    height: 100%;
+    padding: 16px;
+  }
+
+  .img-placeholder .sku-text {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    text-align: center;
+    word-break: break-all;
+  }
+
+  .placeholder-icon {
+    width: 36px;
+    height: 36px;
+    opacity: 0.2;
+  }
+
+  .card-body {
+    padding: 12px 14px 14px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .card-sku {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--teal);
+    letter-spacing: 0.06em;
+    opacity: 0.7;
+  }
+
+  .card-name {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--white);
+    line-height: 1.2;
+    flex: 1;
+  }
+
+  .card-pricing {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-top: 4px;
+    flex-wrap: wrap;
+  }
+
+  .price-wholesale {
+    font-family: 'DM Mono', monospace;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--teal);
+  }
+
+  .price-label {
+    font-family: 'Oswald', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .price-retail {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--muted);
+  }
+
+  .price-divider {
+    color: var(--border);
+    font-size: 12px;
+  }
+
+  .card-footer {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 2px;
+    flex-wrap: wrap;
+  }
+
+  .badge {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    padding: 2px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+  }
+
+  .badge-moq {
+    background: rgba(180,79,255,0.15);
+    border: 1px solid rgba(180,79,255,0.35);
+    color: var(--purple);
+  }
+
+  .badge-cat {
+    background: rgba(0,255,224,0.08);
+    border: 1px solid rgba(0,255,224,0.18);
+    color: rgba(0,255,224,0.6);
+  }
+
+  /* ── EMPTY STATE ── */
+  .empty-state {
+    display: none;
+    text-align: center;
+    padding: 60px 24px;
+    grid-column: 1 / -1;
+  }
+
+  .empty-state.visible { display: block; }
+
+  .empty-state p {
+    font-family: 'Oswald', sans-serif;
+    font-style: italic;
+    font-size: 20px;
+    color: var(--muted);
+  }
+
+  /* ── FOOTER ── */
+  .site-footer {
+    margin-top: 48px;
+    display: flex;
+    height: 36px;
+  }
+
+  .footer-teal {
+    flex: 1;
+    background: var(--teal);
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #030a08;
+  }
+
+  .footer-purple {
+    flex: 1;
+    background: var(--purple);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0 20px;
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #12041f;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .site-header { padding: 14px 16px; }
+    .header-contact { display: none; }
+    .controls { padding: 12px 16px; }
+    .catalog-wrap { padding: 16px; }
+    .product-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+    .card-name { font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+    <div class="logo-badge">
+      <img src="./images/Circle_White.png" alt="WP Glass Co." onerror="this.parentNode.innerHTML='<span class=\'logo-fallback\'>WP</span>'">
+    </div>
+    <div class="header-text">
+      <div class="brand-name">WP Glass Co.</div>
+      <div class="brand-tagline">Premium wholesale smoking accessories — curated, delivered, no fluff.</div>
+    </div>
+    <div class="header-contact">
+      <div><a href="mailto:samleary693@icloud.com">samleary693@icloud.com</a></div>
+      <div><a href="https://instagram.com/wp_glass_co" target="_blank">@wp_glass_co</a></div>
+      <div><a href="https://wpglassco.com" target="_blank">wpglassco.com</a></div>
+      <div style="color: var(--muted); margin-top: 2px;">Est. 2025</div>
+    </div>
+  </div>
+</header>
+
+<!-- CONTROLS -->
+<div class="controls">
+  <div class="controls-inner">
+    <div class="search-wrap">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <circle cx="7" cy="7" r="5" stroke="#00ffe0" stroke-width="1.5"/>
+        <path d="M11 11L14 14" stroke="#00ffe0" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <input type="search" id="search" placeholder="Search by product name or SKU…" autocomplete="off">
+    </div>
+    <div class="filter-row">
+      <span class="filter-label">Filter:</span>
+      <button class="cat-btn active" data-cat="all">All</button>
+      <button class="cat-btn" data-cat="Bangers">Bangers</button>
+      <button class="cat-btn" data-cat="Rigs">Rigs</button>
+      <button class="cat-btn" data-cat="Bongs">Bongs</button>
+      <button class="cat-btn" data-cat="Bowls">Bowls</button>
+      <button class="cat-btn" data-cat="Caps">Caps</button>
+      <button class="cat-btn" data-cat="Tools">Tools</button>
+      <button class="cat-btn" data-cat="Inserts">Inserts</button>
+      <button class="cat-btn" data-cat="Electronics">Electronics</button>
+      <button class="cat-btn" data-cat="Bundles">Bundles</button>
+      <span class="results-count" id="results-count"></span>
+    </div>
+  </div>
+</div>
+
+<!-- CATALOG -->
+<main class="catalog-wrap">
+  <div class="product-grid" id="grid">
+    <div class="empty-state" id="empty">
+      <p>No products match your search.</p>
+    </div>
+  </div>
+</main>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="footer-teal">WP Glass Co.</div>
+  <div class="footer-purple">Est. 2025</div>
+</footer>
+
+<script>
+const PRODUCTS = [
+  // ── BANGERS (10) ──
+  { sku: "WP-NL-821", name: "Banger Spinner Kit", cat: "Bangers", wholesale: 40.0, retail: 50.00, moq: 10 },
+  { sku: "WP-NL-353", name: "Terp Slurper Feeder", cat: "Bangers", wholesale: 35.0, retail: 60.00 },
+  { sku: "WP-NL-363", name: "Terp Tower Slide", cat: "Bangers", wholesale: 36.5, retail: 75.00 },
+  { sku: "WP-NL-183", name: "Campfire Quartz Zanger", cat: "Bangers", wholesale: 44.5, retail: 60.00 },
+  { sku: "WP-NL-335", name: "Seamless Slurper", cat: "Bangers", wholesale: 30.0, retail: 70.00 },
+  { sku: "WP-NL-346", name: "Budget Slide", cat: "Bangers", wholesale: 18.0, retail: 25.00 },
+  { sku: "WP-NL-313", name: "Fully Faceted Tower", cat: "Bangers", wholesale: 35.0, retail: 60.00 },
+  { sku: "WP-NL-375", name: "XXL Seamless Terp Slurper", cat: "Bangers", wholesale: 31.5, retail: 65.00 },
+  { sku: "WP-NL-342", name: "Auto Hybrid Banger w/ Splash Guard", cat: "Bangers", wholesale: 25.2, retail: 35.00 },
+  { sku: "WP-NL-3V25", name: "V2 Terp Slurper", cat: "Bangers", wholesale: 30.0, retail: 55.00 },
+
+  // ── RIGS (10) ──
+  { sku: "WP-RIG-337", name: "BTK Rig with Hard Case", cat: "Rigs", wholesale: 133.0, retail: 200.00 },
+  { sku: "WP-RIG-55R", name: "Encore Shady Klein", cat: "Rigs", wholesale: 89.0, retail: 125.00 },
+  { sku: "WP-RIG-891", name: "Whomp It Aero Disc Dab Rig", cat: "Rigs", wholesale: 140.0, retail: 179.00, moq: 3 },
+  { sku: "WP-RIG-X72W", name: "Rosin Reaper Rig Kit w/ Case", cat: "Rigs", wholesale: 49.5, retail: 156.00 },
+  { sku: "WP-RIG-X72M", name: "Moon Rig Kit w/ Case", cat: "Rigs", wholesale: 48.0, retail: 128.00 },
+  { sku: "WP-RIG-X24", name: "Recycler in Red", cat: "Rigs", wholesale: 34.5, retail: 108.00 },
+  { sku: "WP-RIG-X2M", name: "Colorblock Recycler", cat: "Rigs", wholesale: 23.0, retail: 95.00 },
+  { sku: "WP-RIG-XF72", name: "Fumed 6.5\" Recycler", cat: "Rigs", wholesale: 34.5, retail: 128.00 },
+  { sku: "WP-RIG-XF8", name: "Fumed Zong", cat: "Rigs", wholesale: 19.0, retail: 60.00 },
+  { sku: "WP-RIG-45C", name: "GRAV Rain Showerhead Rig", cat: "Rigs", wholesale: 126.0, retail: 175.00, moq: 1 },
+
+  // ── BONGS (36) ──
+  { sku: "WP-BNG-600", name: "MJ Arsenal Piston Gravity Bong", cat: "Bongs", wholesale: 47.5, retail: 64.00, moq: 3 },
+  { sku: "WP-BNG-401", name: "GRAV Oracle Bong", cat: "Bongs", wholesale: 92.5, retail: 129.00, moq: 2 },
+  { sku: "WP-BNG-598", name: "Encore Lazy Pounder", cat: "Bongs", wholesale: 45.5, retail: 75.00 },
+  { sku: "WP-BNG-X61", name: "Heady Helix", cat: "Bongs", wholesale: 15.5, retail: 39.00 },
+  { sku: "WP-BNG-902", name: "T.A.G. 18\" Purple Beaker", cat: "Bongs", wholesale: 232.5, retail: 360.00 },
+  { sku: "WP-BNG-974", name: "T.A.G. 30\" Lungbuster", cat: "Bongs", wholesale: 151.0, retail: 249.00 },
+  { sku: "WP-BNG-72R", name: "Monark Rocket", cat: "Bongs", wholesale: 89.0, retail: 149.99 },
+  { sku: "WP-BNG-813", name: "Whomp It Large 13\"", cat: "Bongs", wholesale: 157.0, retail: 199.09, moq: 3 },
+  { sku: "WP-BNG-865", name: "Whomp It Spoon Pipe", cat: "Bongs", wholesale: 36.0, retail: 45.00, moq: 5 },
+  { sku: "WP-BNG-86S", name: "Whomp It Mini 8\"", cat: "Bongs", wholesale: 117.0, retail: 149.00, moq: 4 },
+  { sku: "WP-BNG-X4C", name: "Clear 9mm 17\" Beaker", cat: "Bongs", wholesale: 17.25, retail: 50.00 },
+  { sku: "WP-BNG-XM8", name: "Colorblock Zong", cat: "Bongs", wholesale: 18.75, retail: 70.00 },
+  { sku: "WP-BNG-64S", name: "MJ Arsenal Spire Bong", cat: "Bongs", wholesale: 63.45, retail: 80.00 },
+  { sku: "WP-BNG-613", name: "MJ Arsenal Summit Bong", cat: "Bongs", wholesale: 37.5, retail: 50.00 },
+  { sku: "WP-BNG-RH6", name: "RIPNDIP x Hemper Lord Nermal Glass Hand Pipe", cat: "Bongs", wholesale: 30.0, retail: 40.00, moq: 4 },
+  { sku: "WP-BNG-R76", name: "RIPNDIP x Hemper Lord Nermal UFO XL Glass Bong", cat: "Bongs", wholesale: 112.5, retail: 150.00, moq: 1 },
+  { sku: "WP-BNG-H66", name: "6\" Hemper UFO Vortex 14.5mm Glass Bong", cat: "Bongs", wholesale: 37.5, retail: 50.00, moq: 3 },
+  { sku: "WP-BNG-RH4", name: "8\" RIPNDIP x Hemper High Nermal Glass Bong", cat: "Bongs", wholesale: 75.0, retail: 100.00, moq: 2 },
+  { sku: "WP-BNG-63C", name: "MJ Arsenal Vulkan Bubbler — Clear", cat: "Bongs", wholesale: 30.0, retail: 33.00 },
+  { sku: "WP-BNG-6334", name: "MJ Arsenal Vulkan Bubbler — Blush", cat: "Bongs", wholesale: 30.0, retail: 33.00 },
+  { sku: "WP-BNG-630", name: "MJ Arsenal Vulkan Bubbler — Lavender", cat: "Bongs", wholesale: 30.0, retail: 33.00 },
+  { sku: "WP-BNG-635", name: "MJ Arsenal Vulkan Bubbler — Amber", cat: "Bongs", wholesale: 30.0, retail: 33.00 },
+  { sku: "WP-BNG-637", name: "MJ Arsenal Vulkan Bubbler — Cactus", cat: "Bongs", wholesale: 30.0, retail: 33.00 },
+  { sku: "WP-BNG-639", name: "MJ Arsenal Vulkan Bubbler — Azure", cat: "Bongs", wholesale: 30.0, retail: 33.00 },
+  { sku: "WP-BNG-638", name: "MJ Arsenal Vulkan Bubbler — Reef", cat: "Bongs", wholesale: 30.0, retail: 33.00 },
+  { sku: "WP-BNG-6312", name: "MJ Arsenal Vulkan Bubbler — Slate", cat: "Bongs", wholesale: 30.0, retail: 33.00 },
+  { sku: "WP-BNG-632", name: "MJ Arsenal Vulkan Bubbler — Onyx", cat: "Bongs", wholesale: 30.0, retail: 33.00 },
+  { sku: "WP-BNG-633", name: "MJ Arsenal Vulkan Bubbler — Bubblegum", cat: "Bongs", wholesale: 30.0, retail: 33.00 },
+  { sku: "WP-BNG-6390", name: "MJ Arsenal Vulkan Bubbler — Blueberry", cat: "Bongs", wholesale: 30.0, retail: 33.00 },
+  { sku: "WP-BNG-6381", name: "MJ Arsenal Vulkan Bubbler — Seafoam", cat: "Bongs", wholesale: 30.0, retail: 33.00 },
+  { sku: "WP-BNG-467C", name: "GRAV 4\" Sphere Bubbler — Clear", cat: "Bongs", wholesale: 33.0, retail: 45.00, moq: 4 },
+  { sku: "WP-BNG-4675", name: "GRAV 4\" Sphere Bubbler — Amber", cat: "Bongs", wholesale: 33.0, retail: 45.00, moq: 4 },
+  { sku: "WP-BNG-4673", name: "GRAV 4\" Sphere Bubbler — Pink", cat: "Bongs", wholesale: 33.0, retail: 45.00, moq: 4 },
+  { sku: "WP-BNG-4672", name: "GRAV 4\" Sphere Bubbler — Smoke", cat: "Bongs", wholesale: 33.0, retail: 45.00, moq: 4 },
+  { sku: "WP-BNG-4678", name: "GRAV 4\" Sphere Bubbler — Lake", cat: "Bongs", wholesale: 33.0, retail: 45.00, moq: 4 },
+  { sku: "WP-BNG-4679", name: "GRAV 4\" Sphere Bubbler — Cobalt", cat: "Bongs", wholesale: 33.0, retail: 45.00, moq: 4 },
+
+  // ── BOWLS (9) ──
+  { sku: "WP-BL-X21", name: "Black Magic Bowl", cat: "Bowls", wholesale: 4.5, retail: 15.00 },
+  { sku: "WP-BL-16C", name: "Spiral Horn", cat: "Bowls", wholesale: 8.0, retail: 25.00 },
+  { sku: "WP-BL-16M", name: "Multicolor Horn", cat: "Bowls", wholesale: 18.0, retail: 30.00 },
+  { sku: "WP-BL-X81", name: "Spiral Slit Downstem", cat: "Bowls", wholesale: 16.5, retail: 30.00 },
+  { sku: "WP-BL-X28", name: "Pastel Horn Bowl", cat: "Bowls", wholesale: 5.25, retail: 32.00 },
+  { sku: "WP-BL-X219", name: "Opaque Downstem", cat: "Bowls", wholesale: 3.75, retail: 35.00 },
+  { sku: "WP-BL-X12", name: "Vertical Diffuse Downstem", cat: "Bowls", wholesale: 12.1, retail: 22.00 },
+  { sku: "WP-BL-X01", name: "Grid Downstem", cat: "Bowls", wholesale: 16.5, retail: 30.00 },
+  { sku: "WP-BL-768", name: "MJ Arsenal Spiderweb Bowl", cat: "Bowls", wholesale: 15.0, retail: 18.00, moq: 7 },
+
+  // ── CAPS (18) ──
+  { sku: "WP-CP-359", name: "V2 Spinner Cap Blue", cat: "Caps", wholesale: 8.0, retail: 18.00 },
+  { sku: "WP-CP-357", name: "V2 Spinner Cap Green", cat: "Caps", wholesale: 8.0, retail: 18.00 },
+  { sku: "WP-CP-350", name: "V2 Spinner Cap Purple", cat: "Caps", wholesale: 8.0, retail: 18.00 },
+  { sku: "WP-CP-35C", name: "V2 Spinner Cap Clear", cat: "Caps", wholesale: 8.0, retail: 18.00 },
+  { sku: "WP-CP-30C", name: "Bubble Cap Clear", cat: "Caps", wholesale: 15.0, retail: 25.00 },
+  { sku: "WP-CP-308", name: "Bubble Cap Ghost", cat: "Caps", wholesale: 15.0, retail: 25.00 },
+  { sku: "WP-CP-3037", name: "Bubble Cap Lucid", cat: "Caps", wholesale: 15.0, retail: 25.00 },
+  { sku: "WP-CP-309", name: "Bubble Cap Marina", cat: "Caps", wholesale: 15.0, retail: 25.00 },
+  { sku: "WP-CP-303", name: "Bubble Cap Rose Quartz", cat: "Caps", wholesale: 15.0, retail: 25.00 },
+  { sku: "WP-CP-307", name: "Bubble Cap Slyme", cat: "Caps", wholesale: 15.0, retail: 25.00 },
+  { sku: "WP-CP-302S", name: "Bubble Cap Black Opal", cat: "Caps", wholesale: 15.0, retail: 25.00 },
+  { sku: "WP-CP-30CS", name: "Bubble Cap Opal", cat: "Caps", wholesale: 15.0, retail: 25.00 },
+  { sku: "WP-CP-300", name: "Bubble Cap Neo Opal", cat: "Caps", wholesale: 15.0, retail: 25.00 },
+  { sku: "WP-CP-452", name: "GRAV Spinner Carb Cap", cat: "Caps", wholesale: 7.5, retail: 10.00, moq: 14 },
+  { sku: "WP-CP-3592", name: "Chain Terp Slurper Set — Blue", cat: "Caps", wholesale: 8.25, retail: 20.00 },
+  { sku: "WP-CP-3572", name: "Chain Terp Slurper Set — Green", cat: "Caps", wholesale: 8.25, retail: 20.00 },
+  { sku: "WP-CP-3502", name: "Chain Terp Slurper Set — Purple", cat: "Caps", wholesale: 8.25, retail: 20.00 },
+  { sku: "WP-CP-3562", name: "Chain Terp Slurper Set — Yellow", cat: "Caps", wholesale: 8.25, retail: 20.00 },
+
+  // ── TOOLS (23) ──
+  { sku: "WP-TL-XM1", name: "15 Pack Dab Tools", cat: "Tools", wholesale: 29.5, retail: 45.00 },
+  { sku: "WP-TL-X9R", name: "Mill Style Grinder", cat: "Tools", wholesale: 10.8, retail: 60.00 },
+  { sku: "WP-TL-3592", name: "Terp Pearl Grabber w/ 4 Prong Claw — Black", cat: "Tools", wholesale: 7.5, retail: 15.00 },
+  { sku: "WP-TL-3599", name: "Terp Pearl Grabber w/ 4 Prong Claw — Blue", cat: "Tools", wholesale: 7.5, retail: 15.00 },
+  { sku: "WP-TL-359K", name: "Terp Pearl Grabber w/ 4 Prong Claw — Gold", cat: "Tools", wholesale: 7.5, retail: 15.00 },
+  { sku: "WP-TL-359X", name: "Terp Pearl Grabber w/ 4 Prong Claw — Silver", cat: "Tools", wholesale: 7.5, retail: 15.00 },
+  { sku: "WP-TL-379", name: "Terp Pearl Tong Grabber", cat: "Tools", wholesale: 7.5, retail: 12.00 },
+  { sku: "WP-TL-98D2", name: "Small Dab Station — Black Design", cat: "Tools", wholesale: 25.0, retail: 30.00 },
+  { sku: "WP-TL-9802", name: "Small Dab Station — Black Smooth", cat: "Tools", wholesale: 25.0, retail: 30.00 },
+  { sku: "WP-TL-98DC", name: "Small Dab Station — Clear Design", cat: "Tools", wholesale: 25.0, retail: 30.00 },
+  { sku: "WP-TL-980C", name: "Small Dab Station — Clear Smooth", cat: "Tools", wholesale: 25.0, retail: 30.00 },
+  { sku: "WP-TL-98D8", name: "Small Dab Station — Teal Design", cat: "Tools", wholesale: 25.0, retail: 30.00 },
+  { sku: "WP-TL-9808", name: "Small Dab Station — Teal Smooth", cat: "Tools", wholesale: 25.0, retail: 30.00 },
+  { sku: "WP-TL-98D97", name: "Small Dab Station — Glow Blue Design", cat: "Tools", wholesale: 25.0, retail: 30.00 },
+  { sku: "WP-TL-98097", name: "Small Dab Station — Glow Blue Smooth", cat: "Tools", wholesale: 25.0, retail: 30.00 },
+  { sku: "WP-TL-98D77", name: "Small Dab Station — Glow Green Design", cat: "Tools", wholesale: 25.0, retail: 30.00 },
+  { sku: "WP-TL-98077", name: "Small Dab Station — Glow Green Smooth", cat: "Tools", wholesale: 25.0, retail: 30.00 },
+  { sku: "WP-TL-98D20", name: "Small Dab Station — Purple Sunset Design", cat: "Tools", wholesale: 25.0, retail: 30.00 },
+  { sku: "WP-TL-98020", name: "Small Dab Station — Purple Sunset Smooth", cat: "Tools", wholesale: 25.0, retail: 30.00 },
+  { sku: "WP-TL-98DM", name: "Small Dab Station — Rainbow Design", cat: "Tools", wholesale: 25.0, retail: 30.00 },
+  { sku: "WP-TL-980M", name: "Small Dab Station — Rainbow Smooth", cat: "Tools", wholesale: 25.0, retail: 30.00 },
+  { sku: "WP-TL-98D9S", name: "Small Dab Station — Sparkle Blue Design", cat: "Tools", wholesale: 25.0, retail: 30.00 },
+  { sku: "WP-TL-9809S", name: "Small Dab Station — Sparkle Blue Smooth", cat: "Tools", wholesale: 25.0, retail: 30.00 },
+
+  // ── INSERTS (53) ──
+  { sku: "WP-INS-311", name: "Hollow Quartz Vortex Pillar", cat: "Inserts", wholesale: 5.0, retail: 15.00 },
+  { sku: "WP-NL-31ZA", name: "Zebra Quartz Pillar — Size A", cat: "Inserts", wholesale: 6.0, retail: 17.00 },
+  { sku: "WP-NL-31ZB", name: "Zebra Quartz Pillar — Size B", cat: "Inserts", wholesale: 6.0, retail: 17.00 },
+  { sku: "WP-NL-31ZC", name: "Zebra Quartz Pillar — Size C", cat: "Inserts", wholesale: 6.0, retail: 17.00 },
+  { sku: "WP-INS-322-A", name: "4PC Slurper Set Size A — Black", cat: "Inserts", wholesale: 6.5, retail: 20.00 },
+  { sku: "WP-INS-329-A", name: "4PC Slurper Set Size A — Blue", cat: "Inserts", wholesale: 6.5, retail: 20.00 },
+  { sku: "WP-INS-327-A", name: "4PC Slurper Set Size A — Green", cat: "Inserts", wholesale: 6.5, retail: 20.00 },
+  { sku: "WP-INS-323-A", name: "4PC Slurper Set Size A — Pink", cat: "Inserts", wholesale: 6.5, retail: 20.00 },
+  { sku: "WP-INS-324-A", name: "4PC Slurper Set Size A — Red", cat: "Inserts", wholesale: 6.5, retail: 20.00 },
+  { sku: "WP-INS-326-A", name: "4PC Slurper Set Size A — Yellow", cat: "Inserts", wholesale: 6.5, retail: 20.00 },
+  { sku: "WP-INS-322-B", name: "4PC Slurper Set Size B — Black", cat: "Inserts", wholesale: 6.5, retail: 20.00 },
+  { sku: "WP-INS-329-B", name: "4PC Slurper Set Size B — Blue", cat: "Inserts", wholesale: 6.5, retail: 20.00 },
+  { sku: "WP-INS-327-B", name: "4PC Slurper Set Size B — Green", cat: "Inserts", wholesale: 6.5, retail: 20.00 },
+  { sku: "WP-INS-323-B", name: "4PC Slurper Set Size B — Pink", cat: "Inserts", wholesale: 6.5, retail: 20.00 },
+  { sku: "WP-INS-324-B", name: "4PC Slurper Set Size B — Red", cat: "Inserts", wholesale: 6.5, retail: 20.00 },
+  { sku: "WP-INS-326-B", name: "4PC Slurper Set Size B — Yellow", cat: "Inserts", wholesale: 6.5, retail: 20.00 },
+  { sku: "WP-INS-330", name: "Ruby Pearls 3mm", cat: "Inserts", wholesale: 7.5, retail: 14.00 },
+  { sku: "WP-INS-341", name: "Ruby Pearls 4mm", cat: "Inserts", wholesale: 6.0, retail: 10.00 },
+  { sku: "WP-INS-354", name: "Ruby Pearls 5mm", cat: "Inserts", wholesale: 7.5, retail: 12.00 },
+  { sku: "WP-INS-368", name: "Ruby Pearls 8mm", cat: "Inserts", wholesale: 6.5, retail: 10.99 },
+  { sku: "WP-INS-363", name: "Ruby Pearls 6mm", cat: "Inserts", wholesale: 8.52, retail: 14.00 },
+  { sku: "WP-INS-011", name: "BMG Flakes 11mm", cat: "Inserts", wholesale: 25.0, retail: 34.00 },
+  { sku: "WP-INS-012", name: "BMG Flakes 12mm", cat: "Inserts", wholesale: 29.5, retail: 40.00 },
+  { sku: "WP-INS-013", name: "BMG Flakes 13mm", cat: "Inserts", wholesale: 29.5, retail: 40.00 },
+  { sku: "WP-INS-014", name: "BMG Flakes 14mm", cat: "Inserts", wholesale: 29.5, retail: 40.00 },
+  { sku: "WP-INS-015", name: "BMG Flakes 15mm", cat: "Inserts", wholesale: 29.5, retail: 40.00 },
+  { sku: "WP-INS-029", name: "BMG Flakes Slumped", cat: "Inserts", wholesale: 30.5, retail: 55.00 },
+  { sku: "WP-INS-081", name: "BMGx SE Flakes 11mm", cat: "Inserts", wholesale: 37.0, retail: 50.00 },
+  { sku: "WP-INS-082", name: "BMGx SE Flakes 12mm", cat: "Inserts", wholesale: 43.0, retail: 58.00 },
+  { sku: "WP-INS-083", name: "BMGx SE Flakes 13mm", cat: "Inserts", wholesale: 43.0, retail: 58.00 },
+  { sku: "WP-INS-084", name: "BMGx SE Flakes 14mm", cat: "Inserts", wholesale: 44.0, retail: 55.00 },
+  { sku: "WP-INS-085", name: "BMGx SE Flakes 15mm", cat: "Inserts", wholesale: 47.0, retail: 65.00 },
+  { sku: "WP-INS-031", name: "Opal Pearls 3mm — White", cat: "Inserts", wholesale: 6.0, retail: 8.00 },
+  { sku: "WP-INS-032", name: "Opal Pearls 3mm — Black", cat: "Inserts", wholesale: 6.5, retail: 9.00 },
+  { sku: "WP-INS-035", name: "Opal Pearls 3mm — Orange", cat: "Inserts", wholesale: 6.5, retail: 9.00 },
+  { sku: "WP-INS-033", name: "Opal Pearls 3mm — Pink", cat: "Inserts", wholesale: 6.5, retail: 9.00 },
+  { sku: "WP-INS-039", name: "Opal Pearls 3mm — Blue", cat: "Inserts", wholesale: 6.5, retail: 9.00 },
+  { sku: "WP-INS-03S", name: "Opal Pearls 3mm — Apollo", cat: "Inserts", wholesale: 6.5, retail: 9.00 },
+  { sku: "WP-INS-041", name: "Opal Pearls 4mm — White", cat: "Inserts", wholesale: 7.5, retail: 12.00 },
+  { sku: "WP-INS-042", name: "Opal Pearls 4mm — Black", cat: "Inserts", wholesale: 9.0, retail: 14.00 },
+  { sku: "WP-INS-045", name: "Opal Pearls 4mm — Orange", cat: "Inserts", wholesale: 9.0, retail: 14.00 },
+  { sku: "WP-INS-043", name: "Opal Pearls 4mm — Pink", cat: "Inserts", wholesale: 9.0, retail: 14.00 },
+  { sku: "WP-INS-049", name: "Opal Pearls 4mm — Blue", cat: "Inserts", wholesale: 9.0, retail: 14.00 },
+  { sku: "WP-INS-04S", name: "Opal Pearls 4mm — Apollo", cat: "Inserts", wholesale: 9.0, retail: 14.00 },
+  { sku: "WP-INS-051", name: "Opal Pearls 5mm — White", cat: "Inserts", wholesale: 12.5, retail: 17.00 },
+  { sku: "WP-INS-052", name: "Opal Pearls 5mm — Black", cat: "Inserts", wholesale: 15.0, retail: 20.00 },
+  { sku: "WP-INS-055", name: "Opal Pearls 5mm — Orange", cat: "Inserts", wholesale: 15.0, retail: 20.00 },
+  { sku: "WP-INS-053", name: "Opal Pearls 5mm — Pink", cat: "Inserts", wholesale: 15.0, retail: 20.00 },
+  { sku: "WP-INS-059", name: "Opal Pearls 5mm — Blue", cat: "Inserts", wholesale: 15.0, retail: 20.00 },
+  { sku: "WP-INS-05S", name: "Opal Pearls 5mm — Apollo", cat: "Inserts", wholesale: 15.0, retail: 20.00 },
+  { sku: "WP-INS-061", name: "Opal Pearls 6mm — White", cat: "Inserts", wholesale: 18.5, retail: 25.00 },
+  { sku: "WP-INS-062", name: "Opal Pearls 6mm — Black", cat: "Inserts", wholesale: 22.0, retail: 30.00 },
+  { sku: "WP-INS-069", name: "Opal Pearls 6mm — Blue", cat: "Inserts", wholesale: 22.0, retail: 30.00 },
+
+  // ── ELECTRONICS (50) ──
+  { sku: "WP-ELC-6V7", name: "MJ Arsenal Fabcycler Top for Carta", cat: "Electronics", wholesale: 64.0, retail: 88.00, moq: 7 },
+  { sku: "WP-ADD-V61", name: "MJ Arsenal Bridge for Carta", cat: "Electronics", wholesale: 24.0, retail: 30.00 },
+  { sku: "WP-ELC-020", name: "Focus V Aeris — Grape", cat: "Electronics", wholesale: 162.0, retail: 199.00 },
+  { sku: "WP-ELC-029", name: "Focus V Aeris — Midnight", cat: "Electronics", wholesale: 162.0, retail: 199.00 },
+  { sku: "WP-ELC-023", name: "Focus V Aeris — Bubblegum", cat: "Electronics", wholesale: 162.0, retail: 199.00 },
+  { sku: "WP-ELC-022", name: "Focus V Aeris — Black", cat: "Electronics", wholesale: 162.0, retail: 199.00 },
+  { sku: "WP-ELC-027", name: "Focus V Aeris — Jade", cat: "Electronics", wholesale: 162.0, retail: 199.00 },
+  { sku: "WP-ELC-02C", name: "Focus V Aeris — Clear", cat: "Electronics", wholesale: 162.0, retail: 199.00 },
+  { sku: "WP-ELC-702", name: "Yocan Pocket — Black", cat: "Electronics", wholesale: 62.0, retail: 89.99 },
+  { sku: "WP-ELC-70X", name: "Yocan Pocket — Silver", cat: "Electronics", wholesale: 62.0, retail: 89.99 },
+  { sku: "WP-ELC-709", name: "Yocan Pocket — Blue", cat: "Electronics", wholesale: 62.0, retail: 89.99 },
+  { sku: "WP-ELC-708", name: "Yocan Pocket — Mint", cat: "Electronics", wholesale: 62.0, retail: 89.99 },
+  { sku: "WP-ELC-703", name: "Yocan Pocket — Pink", cat: "Electronics", wholesale: 62.0, retail: 89.99 },
+  { sku: "WP-ELC-062", name: "Aeris Bubbler Top — Smoke", cat: "Electronics", wholesale: 71.0, retail: 89.99, moq: 5 },
+  { sku: "WP-ELC-067", name: "Aeris Bubbler Top — Green", cat: "Electronics", wholesale: 71.0, retail: 89.99, moq: 5 },
+  { sku: "WP-ELC-063", name: "Aeris Bubbler Top — Pink", cat: "Electronics", wholesale: 71.0, retail: 89.99, moq: 5 },
+  { sku: "WP-ELC-CS1B", name: "Carta Sport — Black", cat: "Electronics", wholesale: 188.0, retail: 235.00, moq: 4 },
+  { sku: "WP-ELC-CS1T", name: "Carta Sport — Tangerine", cat: "Electronics", wholesale: 188.0, retail: 235.00, moq: 4 },
+  { sku: "WP-ELC-CS1E", name: "Carta Sport — Teal", cat: "Electronics", wholesale: 188.0, retail: 235.00, moq: 4 },
+  { sku: "WP-ELC-CS1L", name: "Carta Sport — Lilac", cat: "Electronics", wholesale: 188.0, retail: 235.00, moq: 4 },
+  { sku: "WP-ELC-1V9", name: "Focus V Saber — Midnight", cat: "Electronics", wholesale: 34.0, retail: 40.00 },
+  { sku: "WP-ELC-1V0", name: "Focus V Saber — Grape", cat: "Electronics", wholesale: 34.0, retail: 40.00 },
+  { sku: "WP-ELC-1V6", name: "Focus V Saber — Forest", cat: "Electronics", wholesale: 34.0, retail: 40.00 },
+  { sku: "WP-ELC-1V4", name: "Focus V Saber — Bordeaux", cat: "Electronics", wholesale: 34.0, retail: 40.00 },
+  { sku: "WP-ELC-1V3", name: "Focus V Saber — Bubblegum", cat: "Electronics", wholesale: 34.0, retail: 40.00 },
+  { sku: "WP-ELC-1V7", name: "Focus V Saber — Jade", cat: "Electronics", wholesale: 34.0, retail: 40.00 },
+  { sku: "WP-ELC-1V8", name: "Focus V Saber — Teal", cat: "Electronics", wholesale: 34.0, retail: 40.00 },
+  { sku: "WP-ELC-1V5", name: "Focus V Saber — Tangerine", cat: "Electronics", wholesale: 34.0, retail: 40.00 },
+  { sku: "WP-ELC-1VL", name: "Focus V Saber — Lilac", cat: "Electronics", wholesale: 34.0, retail: 40.00 },
+  { sku: "WP-ELC-1VC", name: "Focus V Saber — Clear", cat: "Electronics", wholesale: 34.0, retail: 40.00 },
+  { sku: "WP-ELC-1V2", name: "Focus V Saber — Black", cat: "Electronics", wholesale: 34.0, retail: 40.00 },
+  { sku: "WP-ELC-172", name: "Yocan JAWs Hot Knife — Black", cat: "Electronics", wholesale: 37.5, retail: 50.00 },
+  { sku: "WP-ELC-17X", name: "Yocan JAWs Hot Knife — Silver", cat: "Electronics", wholesale: 37.5, retail: 50.00 },
+  { sku: "WP-ELC-179", name: "Yocan JAWs Hot Knife — Blue", cat: "Electronics", wholesale: 37.5, retail: 50.00 },
+  { sku: "WP-ELC-174", name: "Yocan JAWs Hot Knife — Red", cat: "Electronics", wholesale: 37.5, retail: 50.00 },
+  { sku: "WP-ELC-PF68", name: "Lil Bong Pivot Top", cat: "Electronics", wholesale: 3.3, retail: 10.00 },
+  { sku: "WP-ELC-PF7", name: "PUFFCO New Peak — Pine", cat: "Electronics", wholesale: 164.25, retail: 219.00 },
+  { sku: "WP-ELC-PF5", name: "PUFFCO New Peak — Canyon", cat: "Electronics", wholesale: 164.25, retail: 219.00 },
+  { sku: "WP-ELC-PF3", name: "PUFFCO New Peak — Bliss", cat: "Electronics", wholesale: 164.25, retail: 219.00 },
+  { sku: "WP-ELC-PF1", name: "PUFFCO Peak Pro — Cloud", cat: "Electronics", wholesale: 315.0, retail: 420.00 },
+  { sku: "WP-ELC-PF2", name: "PUFFCO Peak Pro — Onyx", cat: "Electronics", wholesale: 315.0, retail: 420.00 },
+  { sku: "WP-ELC-PF45", name: "PUFFCO Daybreak", cat: "Electronics", wholesale: 337.5, retail: 450.00 },
+  { sku: "WP-ELC-PF07", name: "PUFFCO Pivot — Pine", cat: "Electronics", wholesale: 97.5, retail: 130.00 },
+  { sku: "WP-ELC-PF05", name: "PUFFCO Pivot — Mocha", cat: "Electronics", wholesale: 97.5, retail: 130.00 },
+  { sku: "WP-ELC-PF02", name: "PUFFCO Pivot — Onyx", cat: "Electronics", wholesale: 97.5, retail: 130.00 },
+  { sku: "WP-ELC-PFx1", name: "PUFFCO Proxy V2 — Haze", cat: "Electronics", wholesale: 187.5, retail: 250.00 },
+  { sku: "WP-ELC-PFx2", name: "PUFFCO Proxy V2 — Onyx", cat: "Electronics", wholesale: 187.5, retail: 250.00 },
+  { sku: "WP-ELC-R6PF", name: "RIPNDIP x Hemper High Nermal Puffco Peak Top", cat: "Electronics", wholesale: 75.0, retail: 100.00, moq: 2 },
+  { sku: "WP-ELC-66PF", name: "Hemper UFO Vortex Puffco Peak Top", cat: "Electronics", wholesale: 60.0, retail: 80.00, moq: 2 },
+  { sku: "WP-ELC-PF23", name: "Puffco LE Black Peak Pro 3D XL Chamber", cat: "Electronics", wholesale: 72.0, retail: 100.00, moq: 2 },
+
+  // ── BUNDLES (21) ──
+  { sku: "WP-BNDL-010", name: "Celestial", cat: "Bundles", wholesale: 292.5, retail: 852.00 },
+  { sku: "WP-BNDL-012", name: "Big Glass Energy", cat: "Bundles", wholesale: 1150.5, retail: 1827.00 },
+  { sku: "WP-BNDL-014", name: "Pearl Harbor", cat: "Bundles", wholesale: 88.02, retail: 133.99 },
+  { sku: "WP-BNDL-015", name: "Cap Sampler", cat: "Bundles", wholesale: 135.0, retail: 225.00 },
+  { sku: "WP-BNDL-016", name: "Bowl Starter", cat: "Bundles", wholesale: 182.5, retail: 390.00 },
+  { sku: "WP-BNDL-017", name: "Mother of Pearls", cat: "Bundles", wholesale: 345.0, retail: 580.00 },
+  { sku: "WP-BNDL-018", name: "Dab Wave", cat: "Bundles", wholesale: 1401.0, retail: 2805.00 },
+  { sku: "WP-BNDL-019", name: "It's Rigged", cat: "Bundles", wholesale: 494.5, retail: 1613.00 },
+  { sku: "WP-BNDL-020", name: "It's Snowing Concentrate", cat: "Bundles", wholesale: 622.0, retail: 981.00 },
+  { sku: "WP-BNDL-021", name: "It's Yocan Not Yocant", cat: "Bundles", wholesale: 1080.0, retail: 1399.90 },
+  { sku: "WP-BNDL-023", name: "Dabbing For Sport", cat: "Bundles", wholesale: 2580.0, retail: 3150.00 },
+  { sku: "WP-BNDL-024", name: "Olympian", cat: "Bundles", wholesale: 1745.0, retail: 2070.00 },
+  { sku: "WP-BNDL-025", name: "Focused Basics", cat: "Bundles", wholesale: 2095.0, retail: 2390.00 },
+  { sku: "WP-BNDL-026", name: "Unbreakable", cat: "Bundles", wholesale: 1719.0, retail: 2178.27 },
+  { sku: "WP-BNDL-R1P", name: "RIPNDIP Drop Bundle", cat: "Bundles", wholesale: 217.5, retail: 290.00 },
+  { sku: "WP-BND-AEB1", name: "Focus V Aeris Full Color Bundle — Tier 1", cat: "Bundles", wholesale: 1133.35, retail: 1464.97 },
+  { sku: "WP-BND-AEB2", name: "Focus V Aeris Full Color Bundle — Tier 2", cat: "Bundles", wholesale: 2266.7, retail: 2929.94 },
+  { sku: "WP-BND-AEB3", name: "Focus V Aeris Full Color Bundle — Tier 3", cat: "Bundles", wholesale: 3400.05, retail: 4394.91 },
+  { sku: "WP-BND-CRT1", name: "Focus V Carta Sport Full Color Bundle — Tier 1", cat: "Bundles", wholesale: 810.82, retail: 1068.00 },
+  { sku: "WP-BND-CRT2", name: "Focus V Carta Sport Full Color Bundle — Tier 2", cat: "Bundles", wholesale: 1621.64, retail: 2136.00 },
+  { sku: "WP-BND-CRT3", name: "Focus V Carta Sport Full Color Bundle — Tier 3", cat: "Bundles", wholesale: 2432.46, retail: 3204.00 },
+];
+
+let activeCategory = "all";
+let searchQuery = "";
+
+const grid = document.getElementById("grid");
+const empty = document.getElementById("empty");
+const searchInput = document.getElementById("search");
+const countEl = document.getElementById("results-count");
+
+function fmt(n) {
+  return "$" + n.toFixed(2);
+}
+
+function createCard(p) {
+  const card = document.createElement("div");
+  card.className = "product-card";
+
+  const imgWrap = document.createElement("div");
+  imgWrap.className = "card-img-wrap";
+
+  const img = document.createElement("img");
+  img.alt = p.name;
+  img.loading = "lazy";
+  img.src = "./images/" + p.sku + ".PNG";
+  img.onerror = function() {
+    imgWrap.innerHTML = `
+      <div class="img-placeholder">
+        <svg class="placeholder-icon" viewBox="0 0 36 36" fill="none">
+          <rect x="4" y="6" width="28" height="24" rx="3" stroke="#00ffe0" stroke-width="1.5"/>
+          <circle cx="13" cy="15" r="3" stroke="#00ffe0" stroke-width="1.5"/>
+          <path d="M4 26l8-7 6 6 4-4 10 9" stroke="#00ffe0" stroke-width="1.5" stroke-linejoin="round"/>
+        </svg>
+        <span class="sku-text">${p.sku}</span>
+      </div>`;
+  };
+  imgWrap.appendChild(img);
+
+  const body = document.createElement("div");
+  body.className = "card-body";
+
+  body.innerHTML = `
+    <div class="card-sku">${p.sku}</div>
+    <div class="card-name">${p.name}</div>
+    <div class="card-pricing">
+      ${p.wholesale ? `<span class="price-label">WS</span><span class="price-wholesale">${fmt(p.wholesale)}</span><span class="price-divider">|</span>` : ""}
+      ${p.retail ? `<span class="price-label">SRP</span><span class="price-retail">${fmt(p.retail)}</span>` : ""}
+    </div>
+    <div class="card-footer">
+      ${p.moq ? `<span class="badge badge-moq">MOQ ${p.moq}</span>` : ""}
+      <span class="badge badge-cat">${p.cat}</span>
+    </div>`;
+
+  card.appendChild(imgWrap);
+  card.appendChild(body);
+  return card;
+}
+
+function render() {
+  const q = searchQuery.toLowerCase().trim();
+  const filtered = PRODUCTS.filter(p => {
+    const matchCat = activeCategory === "all" || p.cat === activeCategory;
+    const matchQ = !q || p.name.toLowerCase().includes(q) || p.sku.toLowerCase().includes(q);
+    return matchCat && matchQ;
+  });
+
+  while (grid.firstChild && grid.firstChild !== empty) {
+    grid.removeChild(grid.firstChild);
+  }
+
+  if (filtered.length === 0) {
+    empty.classList.add("visible");
+  } else {
+    empty.classList.remove("visible");
+    filtered.forEach(p => grid.insertBefore(createCard(p), empty));
+  }
+
+  countEl.textContent = filtered.length + " of " + PRODUCTS.length + " items";
+}
+
+document.querySelectorAll(".cat-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".cat-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    activeCategory = btn.dataset.cat;
+    render();
+  });
+});
+
+searchInput.addEventListener("input", e => {
+  searchQuery = e.target.value;
+  render();
+});
+
+render();
+</script>
+</body>
+</html>
